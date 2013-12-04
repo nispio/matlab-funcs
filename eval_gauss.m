@@ -1,16 +1,15 @@
-function f = eval_gauss(x,u,v)
+function f = eval_gauss(x,mu,LAMBDA)
     [D, N] = size(x);
-    K = size(u,2);
+    K = size(mu,2);
     
-    U = reshape(repmat(num2cell(u,1),[1 N]),[1 N K]);
-    V = repmat(num2cell(V,[1 2]);
+    X = reshape(num2cell(x,1),N,1);
+    U = reshape(num2cell(mu,1),1,K);
+    V = reshape(num2cell(LAMBDA,[1 2]),1,K);
     
-    C = sqrt(cellfun(@det, V))./(2*pi)^(0.5*D);
-
-    y = cellfun(@minus, repmat(num2cell(x,1),[1 1 K]), repmat(U,[1 N 1]));
-    E = exp(-0.5*y.'*V{1}*y);
+    y = csxfun(@minus, X, U);
+    THETA = csxfun(@(A,x) x.'*A*x, V, y, 'UniformOutput',true);
+    C = sqrt(cellfun(@det, V)./(2*pi)^D);
+    f = C*exp(-0.5*THETA).';
     
-    Y = cellfun(@mtimes, repmat(V,[1 size(x,2)]), repmat(num2cell(x,1),[1 1 K]), 'UniformOutput',false);
-    Z = cellfun(@mtimes, repmat(num2cell(x.',2).',[1 1 5]), Y);
 end
 
